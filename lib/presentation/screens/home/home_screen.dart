@@ -7,6 +7,7 @@ import '../../providers/auth_provider.dart';
 import '../../providers/patient_provider.dart';
 import '../../providers/treatment_provider.dart';
 import '../../widgets/patient_list_item.dart';
+import '../register/register_screen.dart';
 
 /// Home screen showing treatments and user dashboard
 class HomeScreen extends StatefulWidget {
@@ -355,12 +356,9 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () {
-          // TODO: Navigate to registration screen
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Registration feature coming soon!'),
-              backgroundColor: AppTheme.primaryGreen,
-            ),
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const RegisterScreen()),
           );
         },
         backgroundColor: AppTheme.primaryGreen,

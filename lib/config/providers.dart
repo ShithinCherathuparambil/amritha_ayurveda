@@ -7,8 +7,10 @@ import '../presentation/providers/theme_provider.dart';
 import '../presentation/providers/treatment_provider.dart';
 import '../data/datasources/http_auth_datasource.dart';
 import '../data/datasources/http_patient_datasource.dart';
+import '../data/datasources/http_treatment_datasource.dart';
 import '../data/repositories/auth_repository_impl.dart';
 import '../data/repositories/patient_repository_impl.dart';
+import '../data/repositories/treatment_repository_impl.dart';
 
 List<SingleChildWidget> providers = [
   ChangeNotifierProvider<ThemeProvider>(create: (_) => ThemeProvider()),
@@ -17,7 +19,19 @@ List<SingleChildWidget> providers = [
       authRepository: AuthRepositoryImpl(dataSource: HttpAuthDataSource()),
     ),
   ),
-  ChangeNotifierProvider<TreatmentProvider>(create: (_) => TreatmentProvider()),
+  ChangeNotifierProvider<TreatmentProvider>(
+    create: (context) {
+      final authDataSource = HttpAuthDataSource();
+      final treatmentDataSource = HttpTreatmentDataSource(
+        dio: Dio(),
+        authDataSource: authDataSource,
+      );
+      final treatmentRepository = TreatmentRepositoryImpl(
+        treatmentDataSource: treatmentDataSource,
+      );
+      return TreatmentProvider(treatmentRepository: treatmentRepository);
+    },
+  ),
   ChangeNotifierProvider<PatientProvider>(
     create: (context) {
       final authDataSource = HttpAuthDataSource();

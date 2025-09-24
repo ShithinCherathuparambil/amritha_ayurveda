@@ -22,4 +22,18 @@ class PatientRepositoryImpl implements PatientRepository {
       return Left(ServerFailure(message: 'Unexpected error: $e'));
     }
   }
+
+  @override
+  Future<Either<Failure, Patient>> registerPatient(
+    PatientRegistrationRequest request,
+  ) async {
+    try {
+      final patient = await _patientDataSource.registerPatient(request);
+      return Right(patient.toEntity());
+    } on ServerException catch (e) {
+      return Left(ServerFailure(message: e.message));
+    } catch (e) {
+      return Left(ServerFailure(message: 'Unexpected error: $e'));
+    }
+  }
 }

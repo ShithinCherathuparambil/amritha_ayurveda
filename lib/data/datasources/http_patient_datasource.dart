@@ -91,6 +91,87 @@ class HttpPatientDataSource implements PatientDataSource {
     }
   }
 
+  @override
+  Future<PatientModel> registerPatient(
+    PatientRegistrationRequest request,
+  ) async {
+    try {
+      print('👤 Registering patient...');
+
+      // Get auth token
+      final token = await _authDataSource.getAuthToken();
+      if (token == null) {
+        throw const ServerException(message: 'No authentication token found');
+      }
+
+      print('👤 Using token for registration: $token');
+
+      final response = await _dio.post(
+        '${AppConstants.baseUrl}/PatientUpdate',
+        data: request.toJson(),
+        options: Options(
+          headers: {
+            'Authorization': 'Bearer $token',
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+          },
+        ),
+      );
+
+      print('👤 Registration API Response Status: ${response.statusCode}');
+      log('👤 Registration API Response Data: ${response.data}');
+
+      if (response.statusCode == 200) {
+        // Assuming the API returns the created patient data
+        // You may need to adjust this based on the actual API response structure
+        if (response.data['status'] == true) {
+          print('👤 Patient registered successfully');
+          // Return a dummy patient model for now - adjust based on actual API response
+          return PatientModel(
+            id: response.data['patient_id'] ?? 0,
+            patientdetailsSet: [],
+            branch: const BranchModel(
+              id: 0,
+              name: '',
+              patientsCount: 0,
+              location: '',
+              phone: '',
+              mail: '',
+              address: '',
+              gst: '',
+              isActive: true,
+            ),
+            user: request.executive,
+            payment: request.payment,
+            name: request.name,
+            phone: request.phone,
+            address: request.address,
+            price: null,
+            totalAmount: request.totalAmount,
+            discountAmount: request.discountAmount,
+            advanceAmount: request.advanceAmount,
+            balanceAmount: request.balanceAmount,
+            dateNdTime: DateTime.now(),
+            isActive: true,
+            createdAt: DateTime.now(),
+            updatedAt: DateTime.now(),
+          );
+        } else {
+          throw ServerException(
+            message: response.data['message'] ?? 'Registration failed',
+          );
+        }
+      } else {
+        throw ServerException(
+          message: 'Failed to register patient: ${response.statusCode}',
+        );
+      }
+    } catch (e) {
+      log('👤 Registration error: $e');
+      throw ServerException(message: 'Registration error: $e');
+    }
+  }
+
   void dispose() {
     _dio.close();
   }
