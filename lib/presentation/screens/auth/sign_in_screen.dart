@@ -1,4 +1,9 @@
+import 'dart:developer';
+
+import 'package:amritha_ayurveda/presentation/screens/home/home_screen.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:provider/provider.dart';
 import '../../providers/auth_provider.dart';
 import '../../../core/theme/app_theme.dart';
@@ -6,6 +11,7 @@ import 'sign_up_screen.dart';
 
 /// Sign in screen for user authentication
 class SignInScreen extends StatefulWidget {
+  static const route = '/sign_in_screen';
   const SignInScreen({super.key});
 
   @override
@@ -19,18 +25,23 @@ class _SignInScreenState extends State<SignInScreen> {
   bool _isPasswordVisible = false;
 
   @override
+  void initState() {
+    super.initState();
+    if (kDebugMode) {
+      _emailController.text = 'test_user';
+      _passwordController.text = '12345678';
+    }
+  }
+
+  @override
   void dispose() {
     _emailController.dispose();
     _passwordController.dispose();
     super.dispose();
   }
 
-  void _signIn() async {}
-
   void _navigateToSignUp() {
-    Navigator.of(
-      context,
-    ).push(MaterialPageRoute(builder: (context) => const SignUpScreen()));
+    Navigator.of(context).pushNamed(SignUpScreen.route);
   }
 
   @override
@@ -155,7 +166,10 @@ class _SignInScreenState extends State<SignInScreen> {
                     ),
 
                     // Sign In Button
-                    ElevatedButton(onPressed: () {}, child: child),
+                    ElevatedButton(
+                      onPressed: () => _signIn(),
+                      child: Text('Sign In'),
+                    ),
 
                     const SizedBox(height: 24),
 
@@ -241,5 +255,37 @@ class _SignInScreenState extends State<SignInScreen> {
         ),
       ),
     );
+  }
+
+  void _signIn() async {
+    if (_formKey.currentState?.validate() ?? false) {
+      final authProvider = Provider.of<AuthProvider>(context, listen: false);
+
+      try {
+        EasyLoading.show();
+        await authProvider.signInWithEmailAndPassword(
+          email: _emailController.text.trim(),
+          password: _passwordController.text,
+        );
+      } catch (e) {
+        debugPrint(e.toString());
+      } finally {
+        EasyLoading.dismiss();
+      }
+
+      if (authProvider.isAuthenticated) {
+        // Navigate to home screen
+        Navigator.of(context).pushReplacementNamed(HomeScreen.route);
+      } else if (authProvider.errorMessage != null) {
+        log('${authProvider.errorMessage}');
+        // Show error message
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(authProvider.errorMessage!),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
   }
 }

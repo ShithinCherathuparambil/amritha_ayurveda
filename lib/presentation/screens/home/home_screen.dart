@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../../providers/auth_provider.dart';
-import '../../providers/treatment_provider.dart';
+import 'package:restart_app/restart_app.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../../domain/entities/patient.dart';
+import '../../providers/auth_provider.dart';
+import '../../providers/patient_provider.dart';
+import '../../providers/treatment_provider.dart';
+import '../../widgets/patient_list_item.dart';
 
 /// Home screen showing treatments and user dashboard
 class HomeScreen extends StatefulWidget {
@@ -24,6 +28,63 @@ class _HomeScreenState extends State<HomeScreen> {
 
   void _loadData() {
     final treatmentProvider = context.read<TreatmentProvider>();
+    final patientProvider = context.read<PatientProvider>();
+
+    // Fetch patients
+    patientProvider.fetchPatients();
+  }
+
+  void _handleSignOut() async {
+    // Show confirmation dialog
+    final shouldSignOut = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Sign Out'),
+        content: const Text('Are you sure you want to sign out?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            style: TextButton.styleFrom(foregroundColor: AppTheme.errorRed),
+            child: const Text('Sign Out'),
+          ),
+        ],
+      ),
+    );
+
+    if (shouldSignOut == true) {
+      try {
+        // Show loading
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Signing out...'),
+              duration: Duration(seconds: 1),
+            ),
+          );
+        }
+
+        // Sign out
+        final authProvider = context.read<AuthProvider>();
+        await authProvider.signOut();
+
+        // Restart the app
+        await Future.delayed(const Duration(milliseconds: 500));
+        Restart.restartApp();
+      } catch (e) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Error signing out: $e'),
+              backgroundColor: AppTheme.errorRed,
+            ),
+          );
+        }
+      }
+    }
   }
 
   @override
@@ -43,7 +104,9 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           PopupMenuButton<String>(
             onSelected: (value) {
-              if (value == 'logout') {}
+              if (value == 'logout') {
+                _handleSignOut();
+              }
             },
             itemBuilder: (context) => [
               const PopupMenuItem(
@@ -84,7 +147,231 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ],
       ),
-      body: Column(children: []),
+      body: Column(
+        children: [
+          // Search and filter section
+          Container(
+            padding: const EdgeInsets.all(16),
+            color: AppTheme.pureWhite,
+            child: Column(
+              children: [
+                // Search bar
+                Row(
+                  children: [
+                    Expanded(
+                      child: Container(
+                        decoration: BoxDecoration(
+                          border: Border.all(color: Colors.grey[300]!),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: TextField(
+                          decoration: InputDecoration(
+                            hintText: 'Search for treatments',
+                            prefixIcon: Icon(
+                              Icons.search,
+                              color: Colors.grey[600],
+                            ),
+                            border: InputBorder.none,
+                            contentPadding: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 12,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Container(
+                      decoration: BoxDecoration(
+                        color: AppTheme.primaryGreen,
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: TextButton(
+                        onPressed: () {
+                          // TODO: Implement search
+                        },
+                        child: const Text(
+                          'Search',
+                          style: TextStyle(color: AppTheme.pureWhite),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+                // Sort by dropdown
+                Row(
+                  children: [
+                    const Text(
+                      'Sort by :',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 8,
+                      ),
+                      decoration: BoxDecoration(
+                        border: Border.all(color: Colors.grey[300]!),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: DropdownButton<String>(
+                        value: 'Date',
+                        underline: const SizedBox(),
+                        items: const [
+                          DropdownMenuItem(value: 'Date', child: Text('Date')),
+                          DropdownMenuItem(value: 'Name', child: Text('Name')),
+                          DropdownMenuItem(
+                            value: 'Treatment',
+                            child: Text('Treatment'),
+                          ),
+                        ],
+                        onChanged: (value) {
+                          // TODO: Implement sorting
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          // Patient list
+          Expanded(
+            child: Consumer<PatientProvider>(
+              builder: (context, patientProvider, child) {
+                if (patientProvider.isLoading) {
+                  return const Center(
+                    child: CircularProgressIndicator(
+                      color: AppTheme.primaryGreen,
+                    ),
+                  );
+                }
+
+                if (patientProvider.hasError) {
+                  return Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.error_outline,
+                          size: 64,
+                          color: Colors.grey[400],
+                        ),
+                        const SizedBox(height: 16),
+                        Text(
+                          'Error loading patients',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w500,
+                            color: Colors.grey[600],
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          patientProvider.errorMessage ?? 'Unknown error',
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: Colors.grey[500],
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: 16),
+                        ElevatedButton(
+                          onPressed: () => patientProvider.fetchPatients(),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: AppTheme.primaryGreen,
+                            foregroundColor: AppTheme.pureWhite,
+                          ),
+                          child: const Text('Retry'),
+                        ),
+                      ],
+                    ),
+                  );
+                }
+
+                if (!patientProvider.hasPatients) {
+                  return Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.people_outline,
+                          size: 64,
+                          color: Colors.grey[400],
+                        ),
+                        const SizedBox(height: 16),
+                        Text(
+                          'No patients found',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w500,
+                            color: Colors.grey[600],
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          'Pull to refresh or check back later',
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: Colors.grey[500],
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                }
+
+                return RefreshIndicator(
+                  onRefresh: () => patientProvider.refreshPatients(),
+                  color: AppTheme.primaryGreen,
+                  child: ListView.builder(
+                    itemCount: patientProvider.patients.length,
+                    itemBuilder: (context, index) {
+                      final patient = patientProvider.patients[index];
+                      return PatientListItem(
+                        patient: patient,
+                        index: index,
+                        onTap: () {
+                          // TODO: Navigate to patient details
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text('View details for ${patient.name}'),
+                            ),
+                          );
+                        },
+                      );
+                    },
+                  ),
+                );
+              },
+            ),
+          ),
+        ],
+      ),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () {
+          // TODO: Navigate to registration screen
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Registration feature coming soon!'),
+              backgroundColor: AppTheme.primaryGreen,
+            ),
+          );
+        },
+        backgroundColor: AppTheme.primaryGreen,
+        foregroundColor: AppTheme.pureWhite,
+        elevation: 8,
+        icon: const Icon(Icons.person_add),
+        label: const Text(
+          'Register Now',
+          style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16),
+        ),
+      ),
     );
   }
 

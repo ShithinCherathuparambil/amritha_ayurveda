@@ -1,10 +1,9 @@
+import 'package:amritha_ayurveda/presentation/screens/auth/sign_in_screen.dart';
+import 'package:amritha_ayurveda/presentation/screens/home/home_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../providers/auth_provider.dart';
 import '../../core/theme/app_theme.dart';
-import '../../core/constants/app_constants.dart';
-import 'auth/sign_in_screen.dart';
-import 'home/home_screen.dart';
+import '../providers/auth_provider.dart';
 
 /// Splash screen that shows app logo and handles initial navigation
 class SplashScreen extends StatefulWidget {
@@ -20,11 +19,29 @@ class _SplashScreenState extends State<SplashScreen>
   @override
   void initState() {
     super.initState();
+    _checkAuthenticationStatus();
   }
 
-  @override
-  void dispose() {
-    super.dispose();
+  void _checkAuthenticationStatus() async {
+    // Wait for a minimum splash duration
+    await Future.delayed(const Duration(seconds: 2));
+
+    if (!mounted) return;
+
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+
+    // Wait for auth initialization to complete
+    while (authProvider.state == AuthState.initial || authProvider.isLoading) {
+      await Future.delayed(const Duration(milliseconds: 100));
+      if (!mounted) return;
+    }
+
+    // Navigate based on authentication state
+    if (authProvider.isAuthenticated) {
+      Navigator.of(context).pushReplacementNamed(HomeScreen.route);
+    } else {
+      Navigator.of(context).pushReplacementNamed(SignInScreen.route);
+    }
   }
 
   @override
@@ -44,7 +61,7 @@ class _SplashScreenState extends State<SplashScreen>
                 borderRadius: BorderRadius.circular(60),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.2),
+                    color: Colors.black.withValues(alpha: 0.2),
                     blurRadius: 20,
                     offset: const Offset(0, 10),
                   ),

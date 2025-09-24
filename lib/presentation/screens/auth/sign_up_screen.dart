@@ -5,6 +5,7 @@ import '../../../core/theme/app_theme.dart';
 
 /// Sign up screen for user registration
 class SignUpScreen extends StatefulWidget {
+  static const route = '/sign_up_screen';
   const SignUpScreen({super.key});
 
   @override

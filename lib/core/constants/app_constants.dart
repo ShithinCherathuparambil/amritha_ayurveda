@@ -1,4 +1,3 @@
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_timezone/flutter_timezone.dart';
 
 /// Application-wide constants
@@ -34,13 +33,12 @@ class AppConstants {
     return {
       // 'Authorization': 'Bearer ${Token.accessToken}',
       'Timezone': await getTimezone(),
-      // 'Accept-Language': LoggedInUser.isArabic ? 'ar' : 'en'
     };
   }
 
   static const int connectionTimeout = 30000;
   static const int receiveTimeout = 30000;
-  static final String baseUrl = dotenv.env['BASE_URL'] ?? '';
+  static const String baseUrl = 'https://flutter-amr.noviindus.in/api';
 }
 
 Future<String> getTimezone() async {
