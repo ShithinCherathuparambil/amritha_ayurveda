@@ -24,7 +24,7 @@ class _SplashScreenState extends State<SplashScreen>
 
   void _checkAuthenticationStatus() async {
     // Wait for a minimum splash duration
-    await Future.delayed(const Duration(seconds: 2));
+    await Future.delayed(const Duration(seconds: 3));
 
     if (!mounted) return;
 
@@ -48,34 +48,14 @@ class _SplashScreenState extends State<SplashScreen>
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppTheme.primaryGreen,
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            // App Logo/Icon
-            Container(
-              width: 120,
-              height: 120,
-              decoration: BoxDecoration(
-                color: AppTheme.pureWhite,
-                borderRadius: BorderRadius.circular(60),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.2),
-                    blurRadius: 20,
-                    offset: const Offset(0, 10),
-                  ),
-                ],
-              ),
-              child: const Icon(
-                Icons.spa,
-                size: 60,
-                color: AppTheme.primaryGreen,
-              ),
-            ),
-
-            const SizedBox(height: 32),
-          ],
+      body: SizedBox(
+        width: double.infinity,
+          height: double.infinity,
+        child: Image.asset(
+          fit: BoxFit.cover,
+          'assets/images/splash.png',
+          width: double.infinity,
+          height: double.infinity,
         ),
       ),
     );

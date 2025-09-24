@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 import 'package:restart_app/restart_app.dart';
 import '../../../core/theme/app_theme.dart';
-import '../../../domain/entities/patient.dart';
-import '../../providers/auth_provider.dart';
+ import '../../providers/auth_provider.dart';
 import '../../providers/patient_provider.dart';
 import '../../providers/treatment_provider.dart';
 import '../../widgets/patient_list_item.dart';
@@ -100,8 +100,7 @@ class _HomeScreenState extends State<HomeScreen> {
           IconButton(
             icon: const Icon(Icons.notifications_outlined),
             onPressed: () {
-              // TODO: Implement notifications
-            },
+             },
           ),
           PopupMenuButton<String>(
             onSelected: (value) {
@@ -210,15 +209,14 @@ class _HomeScreenState extends State<HomeScreen> {
                         fontWeight: FontWeight.w500,
                       ),
                     ),
-                    const SizedBox(width: 16),
+                    const Spacer(),
                     Container(
                       padding: const EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 8,
-                      ),
+                        horizontal: 12
+                       ),
                       decoration: BoxDecoration(
                         border: Border.all(color: Colors.grey[300]!),
-                        borderRadius: BorderRadius.circular(8),
+                        borderRadius: BorderRadius.circular(33.r),
                       ),
                       child: DropdownButton<String>(
                         value: 'Date',
@@ -228,7 +226,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           DropdownMenuItem(value: 'Name', child: Text('Name')),
                           DropdownMenuItem(
                             value: 'Treatment',
-                            child: Text('Treatment'),
+                            child: Text('Treatment')
                           ),
                         ],
                         onChanged: (value) {
@@ -354,20 +352,35 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ],
       ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () {
-          Navigator.push(
+      // floatingActionButton: FloatingActionButton.extended(
+      //   onPressed: () {
+      //     Navigator.push(
+      //       context,
+      //       MaterialPageRoute(builder: (context) => const RegisterScreen()),
+      //     );
+      //   },
+      //   backgroundColor: AppTheme.primaryGreen,
+      //   foregroundColor: AppTheme.pureWhite,
+      //   elevation: 8,
+      //   icon: const Icon(Icons.person_add),
+      //   label: const Text(
+      //     'Register Now',
+      //     style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16),
+      //   ),
+      // ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+      floatingActionButton: Padding(
+        padding:   EdgeInsets.symmetric(horizontal: 16.w),
+        child: ElevatedButton(
+          
+          onPressed: (){
+
+                      Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => const RegisterScreen()),
+            MaterialPageRoute(builder: (context) => const RegisterScreen())
           );
-        },
-        backgroundColor: AppTheme.primaryGreen,
-        foregroundColor: AppTheme.pureWhite,
-        elevation: 8,
-        icon: const Icon(Icons.person_add),
-        label: const Text(
-          'Register Now',
-          style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16),
+          }, child: Text('Register Now'),
+        style: ElevatedButton.styleFrom(minimumSize: Size(double.infinity, 50.h),),
         ),
       ),
     );

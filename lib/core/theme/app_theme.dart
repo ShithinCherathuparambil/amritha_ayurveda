@@ -1,3 +1,4 @@
+import 'package:amritha_ayurveda/core/utils/text_styles.dart';
 import 'package:flutter/material.dart';
 
 /// Application theme configuration
@@ -115,6 +116,7 @@ class AppTheme {
         ),
       ),
       inputDecorationTheme: InputDecorationTheme(
+      labelStyle: ts14c000940w4,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8),
           borderSide: const BorderSide(color: darkGray),
@@ -122,7 +124,7 @@ class AppTheme {
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8),
           borderSide: const BorderSide(color: darkGray),
-        ),
+        ), 
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8),
           borderSide: const BorderSide(color: primaryGreen, width: 2),
@@ -147,6 +149,7 @@ class AppTheme {
   // Dark Theme
   static ThemeData get darkTheme {
     return ThemeData(
+      
       useMaterial3: true,
       brightness: Brightness.dark,
       primarySwatch: Colors.green,
@@ -191,13 +194,14 @@ class AppTheme {
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
         ),
       ),
+      
       textButtonTheme: TextButtonThemeData(
         style: TextButton.styleFrom(
           foregroundColor: lightGreen,
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         ),
       ),
-      inputDecorationTheme: InputDecorationTheme(
+      inputDecorationTheme: InputDecorationTheme(labelStyle: ts12c000940w4,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8),
           borderSide: const BorderSide(color: Color(0xFF424242)),
