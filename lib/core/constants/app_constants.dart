@@ -16,7 +16,9 @@ class AppConstants {
   // Pagination
   static const int defaultPageSize = 20;
   static const int maxPageSize = 100;
-
+  // Screen Size
+  static const double designWidth = 390;
+  static const double designHeight = 844;
   // Validation
   static const int minPasswordLength = 8;
   static const int maxPasswordLength = 50;

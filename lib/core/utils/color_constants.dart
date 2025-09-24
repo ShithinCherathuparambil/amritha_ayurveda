@@ -1,0 +1,48 @@
+import 'package:flutter/material.dart';
+
+class Coloring {
+  static Color get primaryColor => Color(0xFF0AB3A1);
+  static Color get colorEFF1FF => Color(0xFFEFF1FF);
+  static Color get color0AB3A1 => Color(0xFF0AB3A1);
+  static Color get colorFFFFFF => Color(0xFFFFFFFF);
+  static Color get colorB6B6B6 => Color(0xFFB6B6B6);
+  static Color get colorCDCDCD => Color(0xFFCDCDCD);
+  static Color get color9D9D9D => Color(0xFF9D9D9D);
+  static Color get colorD9D9D9 => Color(0xFFD9D9D9);
+  static Color get color000940 => Color(0xFF000940);
+  static Color get color071986 => Color(0xFF071986);
+  static Color get colorD7D7D7 => Color(0xFFD7D7D7);
+  static Color get color242424 => Color(0xFF242424);
+  static Color get color6B73A5 => Color(0xFF6B73A5);
+  static Color get colorF6F6F6 => Color(0xFFF6F6F6);
+  static Color get color1E1E1E => Color(0xFF1E1E1E);
+  static Color get color111111 => Color(0xFF111111);
+  static Color get colorF9F9F9 => Color(0xFFF9F9F9);
+  static Color get colorFFBC47 => Color(0xFFFFBC47);
+  static Color get color0C902F => Color(0xFF0C902F);
+  static Color get colorFF453F => Color(0xFFFF453F);
+  static Color get color434343 => Color(0xFF434343);
+  static Color get colorFFCFCD => Color(0xFFFFCFCD);
+  static Color get colorCDEAD4 => Color(0xFFCDEAD4);
+  static Color get color8B8D97 => Color(0xFF8B8D97);
+  static Color get colorF9F9FF => Color(0xFFF9F9FF);
+  static Color get color000000 => Color(0xFF000000);
+  static Color get colorE9ECFF => Color(0xFFE9ECFF);
+  static Color get colorEDEFFF => Color(0xFFEDEFFF);
+  static Color get colorC1C1C1 => Color(0xFFC1C1C1);
+  static Color get colorE6E7EC => Color(0xFFE6E7EC);
+  static Color get colorF2F2F2 => Color(0xFFF2F2F2);
+  static Color get color61B985 => Color(0xFF61B985);
+  static Color get colorE3EEFC => Color(0xFFE3EEFC);
+  static Color get color7AD9A1 => Color(0xFF7AD9A1);
+  static Color get color1ACDBA => Color(0xFF1ACDBA);
+  static Color get color8E62FA => Color(0xFF8E62FA);
+  static Color get color6B41D1 => Color(0xFF6B41D1);
+  static Color get color091976 => Color(0xFF091976);
+  static Color get colorE7E7E7 => Color(0xFFE7E7E7);
+  static Color get color181818 => Color(0xFF181818);
+  static Color get colorB3B6C6 => Color(0xFFB3B6C6);
+  static Color get color1DC0B3 => Color(0xFF1DC0B3);
+  static Color get color989898 => Color(0xFF989898);
+  static Color get colorF7F8FF => Color(0xFFF7F8FF);
+}
