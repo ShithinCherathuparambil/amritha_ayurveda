@@ -39,7 +39,7 @@ class HttpTreatmentDataSource implements TreatmentDataSource {
       print('🏥 Using token for treatments: $token');
 
       final response = await _dio.get(
-        ApiUrls.treatmentList,
+        AppConstants.treatmentListURL,
         options: Options(
           headers: {
             'Authorization': 'Bearer $token',
@@ -91,7 +91,7 @@ class HttpTreatmentDataSource implements TreatmentDataSource {
       print('🏢 Using token for branches: $token');
 
       final response = await _dio.get(
-        ApiUrls.branchList,
+        AppConstants.branchListURL,
         options: Options(
           headers: {
             'Authorization': 'Bearer $token',

@@ -28,7 +28,7 @@ class HttpPatientDataSource implements PatientDataSource {
   @override
   Future<List<PatientModel>> getPatients() async {
     try {
-      print('📋 Fetching patients from API...');
+      print('📋 Fetching patients from API...${AppConstants.patientListURL}');
 
       // Get auth token
       final token = await _authDataSource.getAuthToken();
@@ -39,7 +39,7 @@ class HttpPatientDataSource implements PatientDataSource {
       print('📋 Using token: $token');
 
       final response = await _dio.get(
-        ApiUrls.patientList,
+        AppConstants.patientListURL,
         options: Options(
           headers: {
             'Authorization': 'Bearer $token',
@@ -108,7 +108,7 @@ class HttpPatientDataSource implements PatientDataSource {
       print('👤 Using token for registration: $token');
       final Map<String, dynamic> data = request.toJson();
       print('📤 Request data: $data');
-      print('🔗 API URL: ${ApiUrls.patientUpdate}');
+      print('🔗 API URL: ${AppConstants.patientUpdateURL}');
       print('🔑 Token: $token');
 
       // Convert data to FormData but keep numeric values as numbers
@@ -122,7 +122,7 @@ class HttpPatientDataSource implements PatientDataSource {
       );
 
       final response = await _dio.post(
-        ApiUrls.patientUpdate,
+        AppConstants.patientUpdateURL,
         data: formData,
         options: Options(
           headers: {

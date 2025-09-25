@@ -1,3 +1,4 @@
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_timezone/flutter_timezone.dart';
 
 /// Application-wide constants
@@ -38,8 +39,13 @@ class AppConstants {
 
   static const int connectionTimeout = 30000;
   static const int receiveTimeout = 30000;
-  static const String baseUrl = 'https://flutter-amr.noviindus.in/api';
-}
+  static   String baseUrl = dotenv.env['BASE_URL'] ??'';
+  static   String loginURL = '$baseUrl${dotenv.env['LOGIN_ENDPOINT'] ??''}';
+  static   String patientListURL = '$baseUrl${dotenv.env['PATIENT_LIST_ENDPOINT'] ??''}';
+  static   String patientUpdateURL = '$baseUrl${dotenv.env['PATIENT_UPDATE_ENDPOINT'] ??''}';
+  static   String treatmentListURL = '$baseUrl${dotenv.env['TREATMENT_LIST_ENDPOINT'] ??''}';
+  static   String branchListURL = '$baseUrl${dotenv.env['BRANCH_LIST_ENDPOINT'] ??''}';
+ }
 
 Future<String> getTimezone() async {
   final String currentTimeZone = await FlutterTimezone.getLocalTimezone();

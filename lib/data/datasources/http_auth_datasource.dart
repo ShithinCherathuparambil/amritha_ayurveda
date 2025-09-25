@@ -46,11 +46,11 @@ class HttpAuthDataSource implements AuthDataSource {
     required String password,
   }) async {
     try {
-      print('Attempting login with URL: ${ApiUrls.login}');
+      print('Attempting login with URL: ${AppConstants.loginURL}');
       print('Login data: username=$email');
 
       final response = await _dio.post(
-        ApiUrls.login,
+        AppConstants.loginURL,
         data: {'username': email, 'password': password},
         options: Options(
           contentType: Headers.formUrlEncodedContentType,

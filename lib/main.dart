@@ -18,9 +18,9 @@ void main() async {
   await dotenv.load(fileName: ".env");
 
   // Validate environment configuration
-  if (ApiUrls.validateEnvironment()) {
-    ApiUrls.printUrls();
-  }
+  // if (ApiUrls.validateEnvironment()) {
+  //   ApiUrls.printUrls();
+  // }
 
   configLoading();
   runApp(const AmrithaAyurvedaApp());
