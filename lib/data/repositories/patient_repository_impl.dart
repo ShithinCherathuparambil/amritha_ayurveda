@@ -24,12 +24,14 @@ class PatientRepositoryImpl implements PatientRepository {
   }
 
   @override
-  Future<Either<Failure, Patient>> registerPatient(
+  Future<Either<Failure, Patient?>> registerPatient(
     PatientRegistrationRequest request,
   ) async {
     try {
-      final patient = await _patientDataSource.registerPatient(request);
-      return Right(patient.toEntity());
+      await _patientDataSource.registerPatient(request);
+      // Since API only returns success status, return null to indicate success
+      // The actual patient data will be fetched via refresh
+      return const Right(null);
     } on ServerException catch (e) {
       return Left(ServerFailure(message: e.message));
     } catch (e) {

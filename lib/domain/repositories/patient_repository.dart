@@ -5,7 +5,7 @@ import '../../data/datasources/patient_datasource.dart';
 
 abstract class PatientRepository {
   Future<Either<Failure, List<Patient>>> getPatients();
-  Future<Either<Failure, Patient>> registerPatient(
+  Future<Either<Failure, Patient?>> registerPatient(
     PatientRegistrationRequest request,
   );
 }

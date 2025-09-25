@@ -42,21 +42,27 @@ class PatientRegistrationRequest {
       'payment': payment,
       'phone': phone,
       'address': address,
-      'total_amount': totalAmount,
-      'discount_amount': discountAmount,
-      'advance_amount': advanceAmount,
-      'balance_amount': balanceAmount,
+      'total_amount': totalAmount.toInt().toString(), // Remove floating point
+      'discount_amount': discountAmount
+          .toInt()
+          .toString(), // Remove floating point
+      'advance_amount': advanceAmount
+          .toInt()
+          .toString(), // Remove floating point
+      'balance_amount': balanceAmount
+          .toInt()
+          .toString(), // Remove floating point
       'date_nd_time': dateNdTime,
-      'id': id,
-      'male': male,
-      'female': female,
-      'branch': branch,
-      'treatments': treatments,
+      'id': id, // Empty string as required
+      'male': male, // Should be treatment count for male
+      'female': female, // Should be treatment count for female
+      'branch': branch.toString(), // Convert to string for FormData
+      'treatments': treatments, // Should be comma-separated treatment IDs
     };
   }
 }
 
 abstract class PatientDataSource {
   Future<List<PatientModel>> getPatients();
-  Future<PatientModel> registerPatient(PatientRegistrationRequest request);
+  Future<PatientModel?> registerPatient(PatientRegistrationRequest request);
 }

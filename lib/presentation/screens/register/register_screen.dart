@@ -124,18 +124,20 @@ class _RegisterScreenState extends State<RegisterScreen> {
     final treatmentIds = _selectedTreatments
         .map((t) => t.id.toString())
         .join(',');
-    final maleIds = _maleTreatmentCounts
-        .asMap()
-        .entries
-        .where((entry) => entry.value > 0)
-        .map((entry) => _selectedTreatments[entry.key].id.toString())
-        .join(',');
-    final femaleIds = _femaleTreatmentCounts
-        .asMap()
-        .entries
-        .where((entry) => entry.value > 0)
-        .map((entry) => _selectedTreatments[entry.key].id.toString())
-        .join(',');
+
+    // Calculate total male and female counts
+    final totalMaleCount = _maleTreatmentCounts.fold(
+      0,
+      (sum, count) => sum + count,
+    );
+    final totalFemaleCount = _femaleTreatmentCounts.fold(
+      0,
+      (sum, count) => sum + count,
+    );
+
+    // Convert counts to strings for API
+    final maleCountStr = totalMaleCount.toString();
+    final femaleCountStr = totalFemaleCount.toString();
 
     final request = PatientRegistrationRequest(
       name: _nameController.text,
@@ -149,41 +151,107 @@ class _RegisterScreenState extends State<RegisterScreen> {
       balanceAmount: double.tryParse(_balanceAmountController.text) ?? 0.0,
       dateNdTime: _formatDateTime(),
       id: '', // Empty string for new patients
-      male: maleIds,
-      female: femaleIds,
+      male: maleCountStr,
+      female: femaleCountStr,
       branch: _selectedBranch!.id,
       treatments: treatmentIds,
     );
 
     try {
       final patientProvider = context.read<PatientProvider>();
-      // Note: You'll need to add registerPatient method to PatientProvider
-      // await patientProvider.registerPatient(request);
+      final navigator = Navigator.of(context);
+      final scaffoldMessenger = ScaffoldMessenger.of(context);
 
-      // Generate PDF after successful registration
-      await PDFGenerator.generatePatientPDF(
-        context,
-        request,
-        _selectedBranch!,
-        _selectedTreatments,
-        _maleTreatmentCounts,
-        _femaleTreatmentCounts,
-      );
-
+      // Show loading indicator
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
+        scaffoldMessenger.showSnackBar(
           const SnackBar(
-            content: Text('Patient registered successfully!'),
+            content: Row(
+              children: [
+                SizedBox(
+                  width: 20,
+                  height: 20,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    valueColor: AlwaysStoppedAnimation<Color>(
+                      AppTheme.pureWhite,
+                    ),
+                  ),
+                ),
+                SizedBox(width: 16),
+                Text('Registering patient...'),
+              ],
+            ),
             backgroundColor: AppTheme.primaryGreen,
+            duration: Duration(seconds: 30),
           ),
         );
-        Navigator.pop(context);
+      }
+
+      // Call the PatientUpdate API
+      await patientProvider.registerPatient(request);
+
+      // Check if registration was successful (no error means success)
+      if (patientProvider.hasError) {
+        // Registration failed
+        if (mounted) {
+          scaffoldMessenger.hideCurrentSnackBar();
+          scaffoldMessenger.showSnackBar(
+            SnackBar(
+              content: Text(
+                'Registration failed: ${patientProvider.errorMessage ?? 'Unknown error'}',
+              ),
+              backgroundColor: AppTheme.errorRed,
+              duration: const Duration(seconds: 5),
+            ),
+          );
+        }
+      } else {
+        // Registration successful - generate PDF
+        if (mounted) {
+          await PDFGenerator.generatePatientPDF(
+            context,
+            request,
+            _selectedBranch!,
+            _selectedTreatments,
+            _maleTreatmentCounts,
+            _femaleTreatmentCounts,
+          );
+
+          // Hide loading snackbar
+          scaffoldMessenger.hideCurrentSnackBar();
+
+          // Show success message
+          scaffoldMessenger.showSnackBar(
+            const SnackBar(
+              content: Text(
+                'Patient registered successfully! Patient list has been refreshed.',
+              ),
+              backgroundColor: AppTheme.primaryGreen,
+              duration: Duration(seconds: 2),
+            ),
+          );
+
+          // Pop back to home screen and refresh patient list
+          Navigator.of(context).popUntil((route) => route.isFirst);
+
+          // Trigger patient list refresh on home screen
+          if (mounted) {
+            final homePatientProvider = context.read<PatientProvider>();
+            homePatientProvider.fetchPatients();
+          }
+        }
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('Registration failed: $e')));
+        ScaffoldMessenger.of(context).hideCurrentSnackBar();
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Registration failed: $e'),
+            backgroundColor: AppTheme.errorRed,
+            duration: const Duration(seconds: 5),
+          ),
+        );
       }
     }
   }

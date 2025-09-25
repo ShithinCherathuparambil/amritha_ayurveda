@@ -1,13 +1,13 @@
 import 'package:flutter/foundation.dart';
 import '../../domain/entities/patient.dart';
 import '../../domain/repositories/patient_repository.dart';
+import '../../data/datasources/patient_datasource.dart';
 
 class PatientProvider extends ChangeNotifier {
   final PatientRepository _patientRepository;
 
-  PatientProvider({
-    required PatientRepository patientRepository,
-  }) : _patientRepository = patientRepository;
+  PatientProvider({required PatientRepository patientRepository})
+    : _patientRepository = patientRepository;
 
   List<Patient> _patients = [];
   bool _isLoading = false;
@@ -39,7 +39,40 @@ class PatientProvider extends ChangeNotifier {
   }
 
   Future<void> refreshPatients() async {
-    await fetchPatients();
+    // Don't show loading indicator for refresh, just update the data
+    _clearError();
+
+    final result = await _patientRepository.getPatients();
+
+    result.fold(
+      (failure) {
+        _setError(failure.message);
+      },
+      (patients) {
+        _patients = patients;
+        notifyListeners();
+      },
+    );
+  }
+
+  Future<Patient?> registerPatient(PatientRegistrationRequest request) async {
+    _setLoading(true);
+    _clearError();
+
+    final result = await _patientRepository.registerPatient(request);
+
+    return result.fold(
+      (failure) {
+        _setError(failure.message);
+        _setLoading(false);
+        return null;
+      },
+      (patient) async {
+        // Refresh the patient list after successful registration
+        await refreshPatients();
+        return patient;
+      },
+    );
   }
 
   void _setLoading(bool loading) {
