@@ -207,8 +207,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
           );
         }
       } else {
-        // Registration successful - generate PDF
+        // Registration successful - refresh patient list silently before PDF
         if (mounted) {
+          // Silent refresh: Call patient list API without showing loading
+          final homePatientProvider = context.read<PatientProvider>();
+          await homePatientProvider.refreshPatients();
+
+          // Generate PDF
           await PDFGenerator.generatePatientPDF(
             context,
             request,
@@ -224,22 +229,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
           // Show success message
           scaffoldMessenger.showSnackBar(
             const SnackBar(
-              content: Text(
-                'Patient registered successfully! Patient list has been refreshed.',
-              ),
+              content: Text('Patient registered successfully!'),
               backgroundColor: AppTheme.primaryGreen,
               duration: Duration(seconds: 2),
             ),
           );
 
-          // Pop back to home screen and refresh patient list
+          // Pop back to home screen
           Navigator.of(context).popUntil((route) => route.isFirst);
-
-          // Trigger patient list refresh on home screen
-          if (mounted) {
-            final homePatientProvider = context.read<PatientProvider>();
-            homePatientProvider.fetchPatients();
-          }
         }
       }
     } catch (e) {
@@ -281,23 +278,29 @@ class _RegisterScreenState extends State<RegisterScreen> {
           keyboardType: keyboardType,
           enabled: enabled,
           onChanged: onChanged,
+          style: TextStyle(
+            color: AppTheme
+                .darkGray, // Always dark gray for entered text in both themes
+          ),
           decoration: InputDecoration(
             hintText: hint,
-            hintStyle: const TextStyle(color: AppTheme.darkGray),
+            hintStyle: TextStyle(color: Colors.grey[600]),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
-              borderSide: const BorderSide(color: AppTheme.softGray),
+              borderSide: BorderSide(color: Colors.grey[400]!),
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
-              borderSide: const BorderSide(color: AppTheme.softGray),
+              borderSide: BorderSide(color: Colors.grey[400]!),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
-              borderSide: const BorderSide(color: AppTheme.primaryGreen),
+              borderSide: const BorderSide(
+                color: AppTheme.primaryGreen,
+                width: 2,
+              ),
             ),
-            filled: true,
-            fillColor: enabled ? AppTheme.pureWhite : AppTheme.softGray,
+            filled: false,
           ),
           validator: (value) {
             if (value == null || value.isEmpty) {
@@ -325,23 +328,30 @@ class _RegisterScreenState extends State<RegisterScreen> {
         const SizedBox(height: 8),
         DropdownButtonFormField<String>(
           value: _selectedLocation,
+          style: TextStyle(
+            color: AppTheme.darkGray, // Always dark gray for selected text
+          ),
           decoration: InputDecoration(
             hintText: 'Choose your location',
+            hintStyle: TextStyle(color: Colors.grey[600]),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
-              borderSide: const BorderSide(color: AppTheme.softGray),
+              borderSide: BorderSide(color: Colors.grey[400]!),
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
-              borderSide: const BorderSide(color: AppTheme.softGray),
+              borderSide: BorderSide(color: Colors.grey[400]!),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
-              borderSide: const BorderSide(color: AppTheme.primaryGreen),
+              borderSide: const BorderSide(
+                color: AppTheme.primaryGreen,
+                width: 2,
+              ),
             ),
-            filled: true,
-            fillColor: AppTheme.pureWhite,
+            filled: false,
           ),
+          dropdownColor: AppTheme.pureWhite,
           items: _locations.map((location) {
             return DropdownMenuItem(value: location, child: Text(location));
           }).toList(),
@@ -376,25 +386,41 @@ class _RegisterScreenState extends State<RegisterScreen> {
         const SizedBox(height: 8),
         DropdownButtonFormField<Branch>(
           value: _selectedBranch,
+          style: TextStyle(
+            color: AppTheme.darkGray, // Always dark gray for selected text
+          ),
           decoration: InputDecoration(
             hintText: 'Select the branch',
+            hintStyle: TextStyle(color: Colors.grey[600]),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
-              borderSide: const BorderSide(color: AppTheme.softGray),
+              borderSide: BorderSide(color: Colors.grey[400]!),
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
-              borderSide: const BorderSide(color: AppTheme.softGray),
+              borderSide: BorderSide(color: Colors.grey[400]!),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
-              borderSide: const BorderSide(color: AppTheme.primaryGreen),
+              borderSide: const BorderSide(
+                color: AppTheme.primaryGreen,
+                width: 2,
+              ),
             ),
-            filled: true,
-            fillColor: AppTheme.pureWhite,
+            filled: false,
           ),
+          dropdownColor: AppTheme.pureWhite,
           items: branches.map((branch) {
-            return DropdownMenuItem(value: branch, child: Text(branch.name));
+            return DropdownMenuItem(
+              value: branch,
+              child: Text(
+                branch.name,
+                style: TextStyle(
+                  color:
+                      AppTheme.darkGray, // Always dark gray for dropdown items
+                ),
+              ),
+            );
           }).toList(),
           onChanged: (value) {
             setState(() {
@@ -469,46 +495,61 @@ class _RegisterScreenState extends State<RegisterScreen> {
           ),
         ),
         const SizedBox(height: 8),
-        Row(
+        Column(
           children: [
-            Expanded(
-              child: RadioListTile<String>(
-                title: const Text('Cash'),
-                value: 'Cash',
-                groupValue: _selectedPayment,
-                onChanged: (value) {
-                  setState(() {
-                    _selectedPayment = value!;
-                  });
-                },
-                activeColor: AppTheme.primaryGreen,
+            RadioListTile<String>(
+              title: Text(
+                'Cash',
+                style: TextStyle(
+                  color: Theme.of(context).brightness == Brightness.dark
+                      ? AppTheme.pureWhite
+                      : AppTheme.darkGray,
+                ),
               ),
+              value: 'Cash',
+              groupValue: _selectedPayment,
+              onChanged: (value) {
+                setState(() {
+                  _selectedPayment = value!;
+                });
+              },
+              activeColor: AppTheme.primaryGreen,
             ),
-            Expanded(
-              child: RadioListTile<String>(
-                title: const Text('Card'),
-                value: 'Card',
-                groupValue: _selectedPayment,
-                onChanged: (value) {
-                  setState(() {
-                    _selectedPayment = value!;
-                  });
-                },
-                activeColor: AppTheme.primaryGreen,
+            RadioListTile<String>(
+              title: Text(
+                'Card',
+                style: TextStyle(
+                  color: Theme.of(context).brightness == Brightness.dark
+                      ? AppTheme.pureWhite
+                      : AppTheme.darkGray,
+                ),
               ),
+              value: 'Card',
+              groupValue: _selectedPayment,
+              onChanged: (value) {
+                setState(() {
+                  _selectedPayment = value!;
+                });
+              },
+              activeColor: AppTheme.primaryGreen,
             ),
-            Expanded(
-              child: RadioListTile<String>(
-                title: const Text('UPI'),
-                value: 'UPI',
-                groupValue: _selectedPayment,
-                onChanged: (value) {
-                  setState(() {
-                    _selectedPayment = value!;
-                  });
-                },
-                activeColor: AppTheme.primaryGreen,
+            RadioListTile<String>(
+              title: Text(
+                'UPI',
+                style: TextStyle(
+                  color: Theme.of(context).brightness == Brightness.dark
+                      ? AppTheme.pureWhite
+                      : AppTheme.darkGray,
+                ),
               ),
+              value: 'UPI',
+              groupValue: _selectedPayment,
+              onChanged: (value) {
+                setState(() {
+                  _selectedPayment = value!;
+                });
+              },
+              activeColor: AppTheme.primaryGreen,
             ),
           ],
         ),

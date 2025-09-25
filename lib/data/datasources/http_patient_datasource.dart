@@ -1,6 +1,7 @@
 import 'dart:developer';
 
 import 'package:dio/dio.dart';
+import '../../config/url.dart';
 import '../../core/constants/app_constants.dart';
 import '../../core/errors/exceptions.dart';
 import '../models/patient_model.dart';
@@ -38,7 +39,7 @@ class HttpPatientDataSource implements PatientDataSource {
       print('📋 Using token: $token');
 
       final response = await _dio.get(
-        '${AppConstants.baseUrl}/PatientList',
+        ApiUrls.patientList,
         options: Options(
           headers: {
             'Authorization': 'Bearer $token',
@@ -107,7 +108,7 @@ class HttpPatientDataSource implements PatientDataSource {
       print('👤 Using token for registration: $token');
       final Map<String, dynamic> data = request.toJson();
       print('📤 Request data: $data');
-      print('🔗 API URL: ${AppConstants.baseUrl}/PatientUpdate');
+      print('🔗 API URL: ${ApiUrls.patientUpdate}');
       print('🔑 Token: $token');
 
       // Convert data to FormData but keep numeric values as numbers
@@ -121,7 +122,7 @@ class HttpPatientDataSource implements PatientDataSource {
       );
 
       final response = await _dio.post(
-        '${AppConstants.baseUrl}/PatientUpdate',
+        ApiUrls.patientUpdate,
         data: formData,
         options: Options(
           headers: {

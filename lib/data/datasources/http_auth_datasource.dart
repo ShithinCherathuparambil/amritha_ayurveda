@@ -4,6 +4,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import '../models/user_model.dart';
 import '../models/login_response_model.dart';
+import '../../config/url.dart';
 import '../../core/errors/exceptions.dart';
 import '../../core/constants/app_constants.dart';
 import 'auth_datasource.dart';
@@ -45,11 +46,11 @@ class HttpAuthDataSource implements AuthDataSource {
     required String password,
   }) async {
     try {
-      print('Attempting login with URL: ${AppConstants.baseUrl}/Login');
+      print('Attempting login with URL: ${ApiUrls.login}');
       print('Login data: username=$email');
 
       final response = await _dio.post(
-        '${AppConstants.baseUrl}/Login',
+        ApiUrls.login,
         data: {'username': email, 'password': password},
         options: Options(
           contentType: Headers.formUrlEncodedContentType,

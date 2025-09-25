@@ -3,11 +3,12 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 import 'package:restart_app/restart_app.dart';
 import '../../../core/theme/app_theme.dart';
- import '../../providers/auth_provider.dart';
+import '../../providers/auth_provider.dart';
 import '../../providers/patient_provider.dart';
 import '../../providers/treatment_provider.dart';
 import '../../widgets/patient_list_item.dart';
 import '../register/register_screen.dart';
+import '../patient_details/patient_details_screen.dart';
 
 /// Home screen showing treatments and user dashboard
 class HomeScreen extends StatefulWidget {
@@ -99,8 +100,7 @@ class _HomeScreenState extends State<HomeScreen> {
         actions: [
           IconButton(
             icon: const Icon(Icons.notifications_outlined),
-            onPressed: () {
-             },
+            onPressed: () {},
           ),
           PopupMenuButton<String>(
             onSelected: (value) {
@@ -165,8 +165,13 @@ class _HomeScreenState extends State<HomeScreen> {
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: TextField(
+                          style: TextStyle(
+                            color: AppTheme
+                                .darkGray, // Always dark gray for entered text
+                          ),
                           decoration: InputDecoration(
                             hintText: 'Search for treatments',
+                            hintStyle: TextStyle(color: Colors.grey[600]),
                             prefixIcon: Icon(
                               Icons.search,
                               color: Colors.grey[600],
@@ -202,18 +207,17 @@ class _HomeScreenState extends State<HomeScreen> {
                 // Sort by dropdown
                 Row(
                   children: [
-                    const Text(
+                    Text(
                       'Sort by :',
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w500,
+                        color: AppTheme.darkGray,
                       ),
                     ),
                     const Spacer(),
                     Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 12
-                       ),
+                      padding: const EdgeInsets.symmetric(horizontal: 12),
                       decoration: BoxDecoration(
                         border: Border.all(color: Colors.grey[300]!),
                         borderRadius: BorderRadius.circular(33.r),
@@ -221,12 +225,29 @@ class _HomeScreenState extends State<HomeScreen> {
                       child: DropdownButton<String>(
                         value: 'Date',
                         underline: const SizedBox(),
-                        items: const [
-                          DropdownMenuItem(value: 'Date', child: Text('Date')),
-                          DropdownMenuItem(value: 'Name', child: Text('Name')),
+                        style: TextStyle(color: AppTheme.darkGray),
+                        dropdownColor: AppTheme.pureWhite,
+                        items: [
+                          DropdownMenuItem(
+                            value: 'Date',
+                            child: Text(
+                              'Date',
+                              style: TextStyle(color: AppTheme.darkGray),
+                            ),
+                          ),
+                          DropdownMenuItem(
+                            value: 'Name',
+                            child: Text(
+                              'Name',
+                              style: TextStyle(color: AppTheme.darkGray),
+                            ),
+                          ),
                           DropdownMenuItem(
                             value: 'Treatment',
-                            child: Text('Treatment')
+                            child: Text(
+                              'Treatment',
+                              style: TextStyle(color: AppTheme.darkGray),
+                            ),
                           ),
                         ],
                         onChanged: (value) {
@@ -336,10 +357,11 @@ class _HomeScreenState extends State<HomeScreen> {
                         patient: patient,
                         index: index,
                         onTap: () {
-                          // TODO: Navigate to patient details
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text('View details for ${patient.name}'),
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) =>
+                                  PatientDetailsScreen(patient: patient),
                             ),
                           );
                         },
@@ -370,17 +392,18 @@ class _HomeScreenState extends State<HomeScreen> {
       // ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       floatingActionButton: Padding(
-        padding:   EdgeInsets.symmetric(horizontal: 16.w),
+        padding: EdgeInsets.symmetric(horizontal: 16.w),
         child: ElevatedButton(
-          
-          onPressed: (){
-
-                      Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => const RegisterScreen())
-          );
-          }, child: Text('Register Now'),
-        style: ElevatedButton.styleFrom(minimumSize: Size(double.infinity, 50.h),),
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const RegisterScreen()),
+            );
+          },
+          child: Text('Register Now'),
+          style: ElevatedButton.styleFrom(
+            minimumSize: Size(double.infinity, 50.h),
+          ),
         ),
       ),
     );

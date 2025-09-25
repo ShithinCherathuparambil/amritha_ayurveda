@@ -67,9 +67,8 @@ class PatientProvider extends ChangeNotifier {
         _setLoading(false);
         return null;
       },
-      (patient) async {
-        // Refresh the patient list after successful registration
-        await refreshPatients();
+      (patient) {
+        _setLoading(false);
         return patient;
       },
     );

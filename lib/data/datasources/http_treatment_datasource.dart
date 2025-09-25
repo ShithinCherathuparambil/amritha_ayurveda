@@ -1,5 +1,6 @@
 import 'dart:developer';
 import 'package:dio/dio.dart';
+import '../../config/url.dart';
 import '../../core/constants/app_constants.dart';
 import '../../core/errors/exceptions.dart';
 import '../models/treatment_model.dart';
@@ -38,7 +39,7 @@ class HttpTreatmentDataSource implements TreatmentDataSource {
       print('🏥 Using token for treatments: $token');
 
       final response = await _dio.get(
-        '${AppConstants.baseUrl}/TreatmentList',
+        ApiUrls.treatmentList,
         options: Options(
           headers: {
             'Authorization': 'Bearer $token',
@@ -90,7 +91,7 @@ class HttpTreatmentDataSource implements TreatmentDataSource {
       print('🏢 Using token for branches: $token');
 
       final response = await _dio.get(
-        '${AppConstants.baseUrl}/BranchList',
+        ApiUrls.branchList,
         options: Options(
           headers: {
             'Authorization': 'Bearer $token',
